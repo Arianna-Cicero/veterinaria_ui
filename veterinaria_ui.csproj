@@ -57,6 +57,7 @@
     <Compile Include="Logic\LoginManager.cs" />
     <Compile Include="Logic\ProprietarioManager.cs" />
     <Compile Include="Logic\RegisterUser.cs" />
+    <Compile Include="Logic\sqlcon.cs" />
     <Compile Include="Presentation\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

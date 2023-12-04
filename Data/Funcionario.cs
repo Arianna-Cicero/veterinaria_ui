@@ -8,7 +8,7 @@ namespace Data
 {
     public class Funcionario
     {
-        public int funcionario__id { get; set; }
+        public int funcionario_id { get; set; }
         public String nome { get; set; }
         public String tipo_funcionario { get; set; }
         public DateTime data_nasc { get; set; }

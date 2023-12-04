@@ -12,7 +12,7 @@ namespace Logic
         //RETRIEVE
         public void GetFuncionarioInfoFromUser(Funcionario funcionario)
         {
-            Console.WriteLine("Insira as informações do Funcionarioooo");
+            Console.WriteLine("Insira as informações do Funcionario");
             //TODO validação char nome
             Console.WriteLine($"ID do Funcionario: {funcionario.funcionario_id}");
             Console.WriteLine("Nome:");
