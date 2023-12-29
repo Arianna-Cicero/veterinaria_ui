@@ -12,5 +12,6 @@ namespace Data
         public DateTime data { get; set; }
         public float custo { get; set; }
         public int consulta_id { get; set; }
+        public string user { get; set; }
     }
 }

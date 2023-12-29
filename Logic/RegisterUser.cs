@@ -10,23 +10,18 @@ namespace Logic
     internal class RegisterUser
     {
        //comentario
-        public void GetRegisterInfoFromUser(Login login)
+        public void GetRegisterInfoFromUser()
         {
+            Login login = new Login();
             Console.WriteLine("Bem-vindo ao registo");
             Console.WriteLine("Insira o seu username: ");
             login.user = Console.ReadLine();
-            if (login.user == null) 
-            { 
+            while (string.IsNullOrEmpty(login.user)) // Verifica se o username é nulo ou vazio
+            {
                 Console.WriteLine("O username não pode ser vazio. Por favor, insira um nome de username: ");
                 login.user = Console.ReadLine();
-                //íf(login.user == usertaken){
-                //    Console.WriteLine("Este username já está a ser utilizado. Por favor insira um nome diferente.");
-                //}
             }
-            else
-            {
-                login.user = Console.ReadLine();
-            }
+            
 
             Console.WriteLine("Insira a sua password: ");
             login.password = Console.ReadLine();
