@@ -16,8 +16,10 @@ namespace veterinaria_ui.Presentation
             LoginManager loginManager = new LoginManager();
             ConsultaManager consultaManager = new ConsultaManager();
             FaturaManager faturamanager = new FaturaManager();
+            AnimalManager animalManager = new AnimalManager();
             Fatura fatura = new Fatura();
             Login login = new Login();
+            Animal animal = new Animal();
             int largura = 40;
 
 
@@ -113,7 +115,26 @@ namespace veterinaria_ui.Presentation
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     if (login.permissao == 2)
                     {
+                        LoopDeco.ExibirLinhaDecorativa(largura);
                         Console.WriteLine("Consultar animais");
+                        LoopDeco.ExibirLinhaDecorativa(largura);
+                        Console.WriteLine("Insira o ID do animal:");
+                        if (int.TryParse(Console.ReadLine(), out int animalId))
+                        {
+                            // Chamada para consultar o animal pelo ID
+                            Animal animalConsultado = animalManager.GetAnimalById(animalId);
+
+                            if (animalConsultado != null)
+                            {
+                                Console.WriteLine("Animal encontrado:");
+                                animalManager.GetAnimalInfo(animalConsultado); // Mostra as informações do animal
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("ID do animal inválido.");
+                        }
+                        break;
 
                     }
                     else
@@ -127,8 +148,10 @@ namespace veterinaria_ui.Presentation
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     if (login.permissao == 2)
                     {
+                        LoopDeco.ExibirLinhaDecorativa(largura);
                         Console.WriteLine("Registar animais");
-
+                        LoopDeco.ExibirLinhaDecorativa(largura);
+                        animalManager.GetAnimalInfoFromUser();
                     }
                     else
                     {
