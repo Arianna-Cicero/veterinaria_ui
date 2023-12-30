@@ -153,6 +153,7 @@ namespace Logic
             Console.WriteLine($"Cor: {animal.cor}");
             Console.WriteLine($"Raça: {animal.raca}");
             Console.WriteLine($"ID de proprietario: {animal.proprietario_id}");
+            
         }
 
         //PUT

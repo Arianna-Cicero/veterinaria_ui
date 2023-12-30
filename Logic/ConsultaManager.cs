@@ -14,6 +14,7 @@ namespace Logics
 
     internal class ConsultaManager
     {
+
         private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
         public void ListarTodasConsultas()
@@ -72,7 +73,7 @@ namespace Logics
 
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
-                        Console.WriteLine("| ID da consulta | Data da consulta    | Motivo     | ID do animal  | ID do funcionario   |");
+                        Console.WriteLine("|  ID da consulta |   Data da consulta  |   Motivo   | ID do animal  |  ID do funcionario  |");
 
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
@@ -99,6 +100,42 @@ namespace Logics
                 }
             }
         }
+        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo, int funcionarioId)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                string query = "INSERT INTO Consultas (animal_id, data_consulta, motivo, funcionario_id) VALUES (@AnimalId, @DataConsulta, @Motivo, @FuncionarioId)";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    try
+                    {
+                        connection.Open();
+
+                        command.Parameters.AddWithValue("@AnimalId", animalId);
+                        command.Parameters.AddWithValue("@DataConsulta", dataConsulta);
+                        command.Parameters.AddWithValue("@Motivo", motivo);
+                        command.Parameters.AddWithValue("@FuncionarioId", funcionarioId);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            Console.WriteLine("Consulta agendada com sucesso!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Erro ao agendar consulta. Verifique os dados e tente novamente.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                }
+            }
+        }
+
     }
 }
 

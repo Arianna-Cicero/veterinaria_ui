@@ -14,6 +14,7 @@ namespace Data
         public DateTime data_nasc { get; set; }
         public String sexo { get; set; }
         public String user { get; set; }
+        public int permissao { get; set; }
     }
 }
 

@@ -15,7 +15,7 @@ namespace Logics
     {
         private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
         Fatura fatura =  new Fatura();
-        public void GetFaturaInfoFromUser(Fatura fatura)
+        public void CreateFaturaInfoFromUser()
         {
            Console.WriteLine("Informações sobre Fatura");
             fatura.fatura_id = IDgenerator.GenerateUniqueRandomID();
@@ -33,17 +33,24 @@ namespace Logics
             }
 
             Console.WriteLine("Data da fatura (yyyy-MM-dd):");
-            if (DateTime.TryParse(Console.ReadLine(), out DateTime data))
-            {
-                fatura.data = data;
-            }
-            else
+            if (!DateTime.TryParse(Console.ReadLine(), out DateTime data))
             {
                 Console.WriteLine("Data inválida. Utilice o valor padrão (yyyy-MM-dd).");
                 fatura.data = DateTime.MinValue;
+                return;
             }
+            fatura.data = data;
+
             Console.WriteLine("Insira o custo da fatura:");
-            fatura.custo = float.Parse(Console.ReadLine());
+            if (!float.TryParse(Console.ReadLine(), out float custo))
+            {
+                Console.WriteLine("Custo inválido. Por favor, insira um valor numérico válido.");
+                fatura.custo = 0;
+                return;
+            }
+            fatura.custo = custo;
+
+            SaveFaturaToDatabase(fatura);
         }
         public void GetFaturaByUser(string username)
         {
@@ -72,7 +79,6 @@ namespace Logics
                 }
             }
         }
-
         public void GetAllFaturas()
         {
             using (SqlConnection connection = DatabaseManager.GetConnection())
@@ -113,6 +119,35 @@ namespace Logics
                     int count = (int)command.ExecuteScalar();
 
                     return count > 0;
+                }
+            }
+        }
+        public void SaveFaturaToDatabase(Fatura fatura)
+        {
+            using (SqlConnection connection = DatabaseManager.GetConnection())
+            {
+                DatabaseManager.OpenConnection(connection);
+
+                string query = "INSERT INTO Faturas (fatura_id, user, data, custo) " +
+                               "VALUES (@FaturaId, @User, @Data, @Custo)";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@FaturaId", fatura.fatura_id);
+                    command.Parameters.AddWithValue("@User", fatura.user);
+                    command.Parameters.AddWithValue("@Data", fatura.data);
+                    command.Parameters.AddWithValue("@Custo", fatura.custo);
+
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.WriteLine("Fatura registrada com sucesso na base de dados!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Erro ao registrar a fatura na base de dados.");
+                    }
                 }
             }
         }

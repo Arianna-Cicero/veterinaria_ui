@@ -17,10 +17,13 @@ namespace veterinaria_ui.Presentation
             ConsultaManager consultaManager = new ConsultaManager();
             FaturaManager faturamanager = new FaturaManager();
             AnimalManager animalManager = new AnimalManager();
+            FuncionarioManager funcionarioManager = new FuncionarioManager();
+            Funcionario funcionario = new Funcionario();
             Fatura fatura = new Fatura();
             Login login = new Login();
             Animal animal = new Animal();
             int largura = 40;
+
 
 
             LoopDeco.ExibirLinhaDecorativa(largura);
@@ -28,10 +31,10 @@ namespace veterinaria_ui.Presentation
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("1. Ver consultas");
             Console.WriteLine("2. Consultar Faturas ");
-            Console.WriteLine("3. Consultar Pagamentos");
-            Console.WriteLine("4. Pedido de Marcação de Consultas");
+            Console.WriteLine("3. Informações do animal");
             if (login.permissao == 2 || login.permissao == 1)
             {
+                Console.WriteLine("4. Marcação de consultas");
                 Console.WriteLine("5. Consultar Animais");
                 Console.WriteLine("6. Registar Animais");
                 Console.WriteLine("7. Agendar Consultas");
@@ -52,52 +55,78 @@ namespace veterinaria_ui.Presentation
             {
                 case 1:
                     LoopDeco.ExibirLinhaDecorativa(largura);
-                    Console.WriteLine("1. Listar todas as consultas existentes");    
-                    Console.WriteLine("2. Listar todas as consultas de um cliente");
-                    Console.Write("Escreva a opção que deseja: ");
-                    string inputConsulta = Console.ReadLine();
-                    int opcaoConsulta = int.Parse(inputConsulta);
-                    switch (opcaoConsulta)
+                    if (login.permissao == 1 || login.permissao == 2)
                     {
-                        case 1:
-                            LoopDeco.ExibirLinhaDecorativa(largura);
-                            LoopDeco.ExibirLinhaCentralizada("Lista de todas as consultas existentes", largura);
-                            LoopDeco.ExibirLinhaDecorativa(largura);
-                            consultaManager.ListarTodasConsultas();
+                        LoopDeco.ExibirLinhaDecorativa(largura);
+                        Console.WriteLine("1. Listar todas as consultas existentes");
+                        Console.WriteLine("2. Listar todas as consultas de um cliente");
+                        Console.Write("Escreva a opção que deseja: ");
+                        string inputConsulta = Console.ReadLine();
+                        int opcaoConsulta = int.Parse(inputConsulta);
+                        switch (opcaoConsulta)
+                        {
+                            case 1:
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                LoopDeco.ExibirLinhaCentralizada("Lista de todas as consultas existentes", largura);
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                consultaManager.ListarTodasConsultas();                           
+                                break;
 
-                            break;
-
-                        case 2: break;
-
-                        default: 
-                            
-                            break;
+                            case 2:
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                Console.WriteLine("Por favor, escreva o ID do cliente: ");
+                                string inputIdCliente = Console.ReadLine();
+                                int opcaoIdCliente = int.Parse(inputIdCliente);
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                LoopDeco.ExibirLinhaCentralizada("Lista de todas as consultas existentes do cliente", largura);
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                consultaManager.ListarConsultasPorCliente(opcaoIdCliente);
+                                break;
+                            default:
+                                Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
+                                Menuopcoes();
+                                break;
+                        }
                     }
                     break;
                 case 2:
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     if (login.permissao == 1 || login.permissao == 2)
                     {
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        Console.WriteLine("1. Consultar todas as faturas existentes", largura);
-                        Console.WriteLine("2. Criar fatura", largura);
-                        Console.Write("Escreva a opção que deseja: ");
-                        string inputFatura = Console.ReadLine();
-                        int opcaoFatura = int.Parse(inputFatura);
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        switch (opcaoFatura)
+                        bool opcaoValida = false;
+
+                        while (!opcaoValida)
                         {
-                            case 1:
-                                opcao
-                                break;
-                            case 2: 
+                            LoopDeco.ExibirLinhaDecorativa(largura);
+                            Console.WriteLine("1. Consultar todas as faturas existentes");
+                            Console.WriteLine("2. Criar fatura");
+                            Console.Write("Escreva a opção que deseja: ");
+                            string inputFatura = Console.ReadLine();
 
-                                break;
-                            default:
+                            if (int.TryParse(inputFatura, out int opcaoFatura))
+                            {
+                                LoopDeco.ExibirLinhaDecorativa(largura);
 
-                                break;
+                                switch (opcaoFatura)
+                                {
+                                    case 1:
+                                        faturamanager.GetAllFaturas();
+                                        break;
+                                    case 2:
+                                        faturamanager.CreateFaturaInfoFromUser();
+                                        break;
+                                    default:
+                                        Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções.");
+                                        continue;
+                                }
+                                opcaoValida = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Por favor, insira um número válido.");
+                            }
                         }
-                        faturamanager.GetAllFaturas();
+
                     }
                     if (login.permissao == 3 )
                     {
@@ -107,10 +136,36 @@ namespace veterinaria_ui.Presentation
                         faturamanager.GetFaturaByUser(login.user);
                     }
                     break;
+
                 case 3:
+                    LoopDeco.ExibirLinhaDecorativa(largura);
+                    Console.WriteLine("As informações sobre o seu animal:");
+                    LoopDeco.ExibirLinhaDecorativa(largura);
+                    
                     break;
                 case 4:
+                    LoopDeco.ExibirLinhaDecorativa(largura);
+                    Console.WriteLine("Marcação de consultas", largura);
+                    LoopDeco.ExibirLinhaDecorativa(largura);
+                    Console.WriteLine("Indique as seguintes informações para a marcação da consulta:");
+                    Console.WriteLine("ID do animal: ");
+                    string id_animal = Console.ReadLine();
+                    int animalId = int.Parse(id_animal);
+                    Console.WriteLine("Data da consulta: ");
+                    string dataConsultaString = Console.ReadLine();
+                    DateTime dataConsulta;
+                    if (DateTime.TryParse(dataConsultaString, out dataConsulta))
+                    {
+                        Console.WriteLine($"Date of Consultation: {dataConsulta.ToShortDateString()}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input for date. Please enter a valid date in the correct format.");
+                    }
+
+                    consultaManager.AgendarConsulta(animalId, dataConsulta, motivo, funcionario);
                     break;
+                
                 case 5:
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     if (login.permissao == 2)
@@ -121,13 +176,12 @@ namespace veterinaria_ui.Presentation
                         Console.WriteLine("Insira o ID do animal:");
                         if (int.TryParse(Console.ReadLine(), out int animalId))
                         {
-                            // Chamada para consultar o animal pelo ID
                             Animal animalConsultado = animalManager.GetAnimalById(animalId);
 
                             if (animalConsultado != null)
                             {
                                 Console.WriteLine("Animal encontrado:");
-                                animalManager.GetAnimalInfo(animalConsultado); // Mostra as informações do animal
+                                animalManager.GetAnimalInfo(animalConsultado); 
                             }
                         }
                         else
@@ -157,14 +211,15 @@ namespace veterinaria_ui.Presentation
                     {
                         Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
                         Menuopcoes();
-
                     }
                     break;
                 case 7:
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     if (login.permissao == 2)
                     {
+                        LoopDeco.ExibirLinhaDecorativa(largura);
                         Console.WriteLine("Agendar consulta");
+                        LoopDeco.ExibirLinhaDecorativa(largura);
 
                     }
                     else
@@ -180,19 +235,53 @@ namespace veterinaria_ui.Presentation
                         Console.WriteLine("1. Adicionar funcionario");
                         Console.WriteLine("2. Editar funcionario");
                         Console.WriteLine("3. Remover funcionario");
+                        Console.WriteLine("4. Consultar funcionarios");
                         Console.Write("Escolha a opção que deseja: ");
                         string input2 = Console.ReadLine();
                         int opcao2 = int.Parse(input2);
-                        switch(opcao2)
+                        switch (opcao2)
                         {
-                            case 1: Console.WriteLine();
-                                break; 
-                            case 2: Console.WriteLine();
+                            case 1:
+                                Console.WriteLine();
+                                funcionarioManager.GetFuncionarioInfoFromUser(funcionario);
                                 break;
-                            case 3: Console.WriteLine();
+                            case 2:
+                                Console.WriteLine();
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                Console.WriteLine("Insira o ID do funcionario que pretente editar");
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                funcionario.funcionario_id = int.Parse(Console.ReadLine());
+                                funcionarioManager.EditarFuncionarioPorId(funcionario.funcionario_id);
+                                break;
+                            case 3:
+                                Console.WriteLine();
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                Console.WriteLine("Insira o ID do funcionário que pretende remover:");
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                if (int.TryParse(Console.ReadLine(), out int funcionarioId))
+                                {
+                                    funcionarioManager.RemoverFuncionarioPorId(funcionarioId);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Por favor, insira um ID válido (número inteiro).");
+                                    Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
+                                    Menuopcoes();
+                                    break;
+                                }
+                                break;
+                            case 4:
+                                Console.WriteLine();
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                funcionarioManager.GetFuncionario();
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+                                break;
+                            default:
+                                Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
+                                Menuopcoes();
                                 break;
                         }
-                    }
+                    }                   
                     else 
                     {
                         Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
