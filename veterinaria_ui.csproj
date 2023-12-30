@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,6 +59,9 @@
     <Compile Include="Logic\ProprietarioManager.cs" />
     <Compile Include="Logic\RegisterUser.cs" />
     <Compile Include="Logic\sqlcon.cs" />
+    <Compile Include="Presentation\LoginMenu.cs" />
+    <Compile Include="Presentation\LoopDeco.cs" />
+    <Compile Include="Presentation\MenuOpcoes.cs" />
     <Compile Include="Presentation\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

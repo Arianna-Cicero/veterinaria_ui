@@ -10,5 +10,6 @@ namespace Data
     {
         public string user { get; set; }
         public string password { get; set; }
+        public int permissao { get; set; }
     }
 }
