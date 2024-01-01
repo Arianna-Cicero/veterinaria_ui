@@ -18,13 +18,13 @@ namespace Logics
         public void CreateFaturaInfoFromUser()
         {
            Console.WriteLine("Informações sobre Fatura");
-            fatura.fatura_id = IDgenerator.GenerateUniqueRandomID();
-            Console.WriteLine($"ID da fatura: {fatura.fatura_id}");
+            fatura.Fatura_id = IDgenerator.GenerateUniqueRandomID();
+            Console.WriteLine($"ID da fatura: {fatura.Fatura_id}");
             Console.WriteLine("Utilizador da fatura:");
             string userInput = Console.ReadLine();
             if (UserExists(userInput))
             {
-                fatura.user = userInput;
+                fatura.User = userInput;
                 Console.WriteLine("Utilizador válido. Fatura atualizada com sucesso!");
             }
             else
@@ -36,19 +36,19 @@ namespace Logics
             if (!DateTime.TryParse(Console.ReadLine(), out DateTime data))
             {
                 Console.WriteLine("Data inválida. Utilice o valor padrão (yyyy-MM-dd).");
-                fatura.data = DateTime.MinValue;
+                fatura.Data = DateTime.MinValue;
                 return;
             }
-            fatura.data = data;
+            fatura.Data = data;
 
             Console.WriteLine("Insira o custo da fatura:");
             if (!float.TryParse(Console.ReadLine(), out float custo))
             {
                 Console.WriteLine("Custo inválido. Por favor, insira um valor numérico válido.");
-                fatura.custo = 0;
+                fatura.Custo = 0;
                 return;
             }
-            fatura.custo = custo;
+            fatura.Custo = custo;
 
             SaveFaturaToDatabase(fatura);
         }
@@ -133,10 +133,10 @@ namespace Logics
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@FaturaId", fatura.fatura_id);
-                    command.Parameters.AddWithValue("@User", fatura.user);
-                    command.Parameters.AddWithValue("@Data", fatura.data);
-                    command.Parameters.AddWithValue("@Custo", fatura.custo);
+                    command.Parameters.AddWithValue("@FaturaId", fatura.Fatura_id);
+                    command.Parameters.AddWithValue("@User", fatura.User);
+                    command.Parameters.AddWithValue("@Data", fatura.Data);
+                    command.Parameters.AddWithValue("@Custo", fatura.Custo);
 
                     int rowsAffected = command.ExecuteNonQuery();
 

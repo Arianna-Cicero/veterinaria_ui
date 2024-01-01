@@ -8,14 +8,14 @@ namespace Data
 {
     public class Animal
     {
-        public int animal_id { get; set; }
-        public String nome { get; set; } 
-        public DateTime data_nasc { get; set; }
-        public String sexo { get; set; }
-        public String cor { get; set; }
-        public String raca { get; set; }
-        public String especie { get; set; }
-        public int proprietario_id { get; set; }
+        public int Animal_id { get; set; }
+        public String Nome { get; set; } 
+        public DateTime Data_nasc { get; set; }
+        public String Sexo { get; set; }
+        public String Cor { get; set; }
+        public String Raca { get; set; }
+        public String Especie { get; set; }
+        public int Proprietario_id { get; set; }
     }
 }
 

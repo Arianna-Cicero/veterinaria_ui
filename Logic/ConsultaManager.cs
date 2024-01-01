@@ -30,7 +30,7 @@ namespace Logics
                         connection.Open();
 
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
-                        Console.WriteLine("| ID da consulta | Data da consulta | Motivo    | ID do animal | ID do funcionario |");
+                        Console.WriteLine("|  ID da consulta |   Data da consulta  |   Motivo   |  ID do animal |  ID do funcionario  |");
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
 
