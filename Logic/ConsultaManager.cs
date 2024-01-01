@@ -100,11 +100,11 @@ namespace Logics
                 }
             }
         }
-        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo, int funcionarioId)
+        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                string query = "INSERT INTO Consultas (animal_id, data_consulta, motivo, funcionario_id) VALUES (@AnimalId, @DataConsulta, @Motivo, @FuncionarioId)";
+                string query = "INSERT INTO Consultas (animal_id, data_consulta, motivo) VALUES (@AnimalId, @DataConsulta, @Motivo)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -115,7 +115,7 @@ namespace Logics
                         command.Parameters.AddWithValue("@AnimalId", animalId);
                         command.Parameters.AddWithValue("@DataConsulta", dataConsulta);
                         command.Parameters.AddWithValue("@Motivo", motivo);
-                        command.Parameters.AddWithValue("@FuncionarioId", funcionarioId);
+                        
 
                         int rowsAffected = command.ExecuteNonQuery();
 

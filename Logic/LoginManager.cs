@@ -15,7 +15,6 @@ namespace Logic
     public class LoginManager
     {
         private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-        private const string Pattern = "@][!@#$%^&*(),.?\\:{}|<>";
         private List<string> UsernamesExistentes = new List<string>();
         public void GetLoginInfoFromUser()
         {
@@ -166,12 +165,6 @@ namespace Logic
             if (login.password.Length < 8)
             {
                 Console.WriteLine("A senha deve ter pelo menos 8 caracteres.");
-                return false;
-            }
-
-            if (!Regex.IsMatch(login.password, Pattern))
-            {
-                Console.WriteLine("A senha deve conter pelo menos um caractere especial.");
                 return false;
             }
 
