@@ -18,7 +18,7 @@ namespace Logic
         {
             Console.WriteLine("Insira as informações do animal");
 
-            animal.animal_id = IDgenerator.GenerateUniqueRandomID();
+            animal.Animal_id = IDgenerator.GenerateUniqueRandomID();
 
             Console.WriteLine("Nome:");
             string nomeInput = Console.ReadLine();
@@ -27,17 +27,17 @@ namespace Logic
                 Console.WriteLine("Nome inválido. Por favor, insira um nome válido:");
                 nomeInput = Console.ReadLine();
             }
-            animal.nome = nomeInput;
+            animal.Nome = nomeInput;
 
             Console.WriteLine("Data de nascimento (yyyy-MM-dd):");
             if (DateTime.TryParse(Console.ReadLine(), out DateTime dataNasc))
             {
-                animal.data_nasc = dataNasc;
+                animal.Data_nasc = dataNasc;
             }
             else
             {
                 Console.WriteLine("Data de Nascimento inválida. Utilize o valor padrão (yyyy-MM-dd).");
-                animal.data_nasc = DateTime.MinValue;
+                animal.Data_nasc = DateTime.MinValue;
             }
 
             Console.WriteLine("Sexo (Feminino/Masculino):");
@@ -47,21 +47,21 @@ namespace Logic
                 Console.WriteLine("Opção de sexo incorreta. As opções disponíveis são Feminino ou Masculino:");
                 sexoInput = Console.ReadLine();
             }
-            animal.sexo = sexoInput;
+            animal.Sexo = sexoInput;
 
             Console.WriteLine("Cor:");
-            animal.cor = Console.ReadLine();
+            animal.Cor = Console.ReadLine();
 
             Console.WriteLine("Raça:");
-            animal.raca = Console.ReadLine();
+            animal.Raca = Console.ReadLine();
 
             Console.WriteLine("Especie:");
-            animal.especie = Console.ReadLine();
+            animal.Especie = Console.ReadLine();
 
             Console.WriteLine("ID do Proprietário:");
             if (int.TryParse(Console.ReadLine(), out int proprietarioId))
             {
-                animal.proprietario_id = proprietarioId;
+                animal.Proprietario_id = proprietarioId;
             }
             else
             {
@@ -83,14 +83,14 @@ namespace Logic
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@AnimalId", animal.animal_id);
-                    command.Parameters.AddWithValue("@Nome", animal.nome);
-                    command.Parameters.AddWithValue("@DataNasc", animal.data_nasc);
-                    command.Parameters.AddWithValue("@Sexo", animal.sexo);
-                    command.Parameters.AddWithValue("@Cor", animal.cor);
-                    command.Parameters.AddWithValue("@Raca", animal.raca);
-                    command.Parameters.AddWithValue("@Especie", animal.especie);
-                    command.Parameters.AddWithValue("@ProprietarioId", animal.proprietario_id);
+                    command.Parameters.AddWithValue("@AnimalId", animal.Animal_id);
+                    command.Parameters.AddWithValue("@Nome", animal.Nome);
+                    command.Parameters.AddWithValue("@DataNasc", animal.Data_nasc);
+                    command.Parameters.AddWithValue("@Sexo", animal.Sexo);
+                    command.Parameters.AddWithValue("@Cor", animal.Cor);
+                    command.Parameters.AddWithValue("@Raca", animal.Raca);
+                    command.Parameters.AddWithValue("@Especie", animal.Especie);
+                    command.Parameters.AddWithValue("@ProprietarioId", animal.Proprietario_id);
 
                     int rowsAffected = command.ExecuteNonQuery();
 
@@ -105,7 +105,6 @@ namespace Logic
                 }
             }
         }
-        //GET
         public Animal GetAnimalById(int animalId)
         {
             using (SqlConnection connection = DatabaseManager.GetConnection())
@@ -124,13 +123,13 @@ namespace Logic
                         {
                             Animal animal = new Animal
                             {
-                                animal_id = reader.GetInt32(0),
-                                nome = reader.GetString(1),
-                                data_nasc = reader.GetDateTime(2),
-                                especie = reader.GetString(3),
-                                cor = reader.GetString(4),
-                                raca = reader.GetString(5),
-                                proprietario_id = reader.GetInt32(6)
+                                Animal_id = reader.GetInt32(0),
+                                Nome = reader.GetString(1),
+                                Data_nasc = reader.GetDateTime(2),
+                                Especie = reader.GetString(3),
+                                Cor = reader.GetString(4),
+                                Raca = reader.GetString(5),
+                                Proprietario_id = reader.GetInt32(6)
                             };
 
                             return animal;
@@ -146,16 +145,14 @@ namespace Logic
         }
         public void GetAnimalInfo(Animal animal)
         {
-            Console.WriteLine($"ID do Animal : {animal.animal_id}");
-            Console.WriteLine($"Nome: {animal.nome}");
-            Console.WriteLine($"Data de Nascimento: {animal.data_nasc.ToShortDateString()}");
-            Console.WriteLine($"Especie: {animal.especie}");
-            Console.WriteLine($"Cor: {animal.cor}");
-            Console.WriteLine($"Raça: {animal.raca}");
-            Console.WriteLine($"ID de proprietario: {animal.proprietario_id}");
+            Console.WriteLine($"ID do Animal : {animal.Animal_id}");
+            Console.WriteLine($"Nome: {animal.Nome}");
+            Console.WriteLine($"Data de Nascimento: {animal.Data_nasc.ToShortDateString()}");
+            Console.WriteLine($"Especie: {animal.Especie}");
+            Console.WriteLine($"Cor: {animal.Cor}");
+            Console.WriteLine($"Raça: {animal.Raca}");
+            Console.WriteLine($"ID de proprietario: {animal.Proprietario_id}");
             
         }
-
-        //PUT
     }
 }

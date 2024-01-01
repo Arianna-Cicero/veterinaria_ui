@@ -8,10 +8,10 @@ namespace Data
 {
     public class Fatura
     {
-        public int fatura_id { get; set; }
-        public DateTime data { get; set; }
-        public float custo { get; set; }
-        public int consulta_id { get; set; }
-        public string user { get; set; }
+        public int Fatura_id { get; set; }
+        public DateTime Data { get; set; }
+        public float Custo { get; set; }
+        public int Consulta_id { get; set; }
+        public string User { get; set; }
     }
 }

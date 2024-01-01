@@ -17,7 +17,7 @@ namespace veterinaria_ui.Presentation
         FuncionarioManager funcionarioManager = new FuncionarioManager();
         Funcionario funcionario = new Funcionario();
         Login login = new Login();
-        int largura = 40;
+        readonly int largura = 40;
 
         public void Menuopcoes() 
         {
@@ -27,15 +27,14 @@ namespace veterinaria_ui.Presentation
             Console.WriteLine("1. Ver consultas");
             Console.WriteLine("2. Consultar Faturas ");
             Console.WriteLine("3. Informações do animal");
-            if (login.permissao == 2 || login.permissao == 1)
+            if (login.Permissao == 2 || login.Permissao == 1)
             {
                 Console.WriteLine("4. Marcação de consultas");
                 Console.WriteLine("5. Consultar Animais");
                 Console.WriteLine("6. Registar Animais");
-                if(login.permissao == 1)
+                if(login.Permissao == 1)
                 {
                     Console.WriteLine("7. Gerir funcionarios");
-
                 }
             }
             LoopDeco.ExibirLinhaDecorativa(largura);
@@ -77,7 +76,7 @@ namespace veterinaria_ui.Presentation
         public void VerConsultas()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.permissao == 1 || login.permissao == 2)
+            if (login.Permissao == 1 || login.Permissao == 2)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("1. Listar todas as consultas existentes");
@@ -114,7 +113,7 @@ namespace veterinaria_ui.Presentation
         public void ConsultarFaturas()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.permissao == 1 || login.permissao == 2)
+            if (login.Permissao == 1 || login.Permissao == 2)
             {
                 bool opcaoValida = false;
 
@@ -151,12 +150,12 @@ namespace veterinaria_ui.Presentation
                 }
 
             }
-            if (login.permissao == 3)
+            if (login.Permissao == 3)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Consultar as faturas do cliente", largura);
                 LoopDeco.ExibirLinhaDecorativa(largura);
-                faturamanager.GetFaturaByUser(login.user);
+                faturamanager.GetFaturaByUser(login.Username);
             }
         }
 
@@ -196,7 +195,7 @@ namespace veterinaria_ui.Presentation
         public void ConsultarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.permissao == 2)
+            if (login.Permissao == 2)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Consultar animais");
@@ -227,7 +226,7 @@ namespace veterinaria_ui.Presentation
 
         public void GerirFuncionarios()
         {
-            if (login.permissao == 1)
+            if (login.Permissao == 1)
             {
                 Console.WriteLine("1. Adicionar funcionario");
                 Console.WriteLine("2. Editar funcionario");
@@ -289,7 +288,7 @@ namespace veterinaria_ui.Presentation
         public void ResgistarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.permissao == 2)
+            if (login.Permissao == 2)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Registar animais");

@@ -13,7 +13,6 @@ namespace veterinaria_ui.Presentation
         public LoginMenu()
         {
             LoginManager loginManager = new LoginManager();
-            Login login = new Login();
             int largura = 40;
 
             LoopDeco.ExibirLinhaDecorativa(largura);

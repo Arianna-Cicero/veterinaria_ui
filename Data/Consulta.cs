@@ -8,10 +8,10 @@ namespace Data
 {
     public class Consulta
     {
-        public int consulta_id { get; set; }
-        public DateTime data_consulta { get; set; }
-        public string motivo { get; set; }
-        public int animal_id { get; set; }
-        public int funcionario_id { get; set; }
+        public int Consulta_id { get; set; }
+        public DateTime Data_consulta { get; set; }
+        public string Motivo { get; set; }
+        public int Animal_id { get; set; }
+        public int Funcionario_id { get; set; }
     }
 }

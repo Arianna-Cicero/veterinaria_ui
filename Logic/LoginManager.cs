@@ -30,11 +30,11 @@ namespace Logic
             if (opcao == 1)
             {
                 Console.WriteLine("Insira o username que pretende utilizar:");
-                login.user = Console.ReadLine();
+                login.Username = Console.ReadLine();
                 if (GetValidUsername(login))
                 {
                     Console.WriteLine("Insira a password que pretende utilizar:");
-                    login.password = Console.ReadLine();
+                    login.Password = Console.ReadLine();
                     if (IsValidPassword(login))
                     {
                         LoopDeco.ExibirLinhaDecorativa(largura);
@@ -49,8 +49,8 @@ namespace Logic
                             using (SqlCommand command = new SqlCommand(query, connection))
                             {
                                 
-                                command.Parameters.AddWithValue("@Username", login.user);
-                                command.Parameters.AddWithValue("@Password", login.password);
+                                command.Parameters.AddWithValue("@Username", login.Username);
+                                command.Parameters.AddWithValue("@Password", login.Password);
 
                                 try
                                 {
@@ -156,19 +156,19 @@ namespace Logic
             Console.WriteLine("Insira novamente a sua senha para verificação:");
             string Verificacao = Console.ReadLine();
 
-            if (login.password != Verificacao)
+            if (login.Password != Verificacao)
             {
                 Console.WriteLine("As senhas não coincidem. Tente novamente.");
                 return false;
             }
 
-            if (login.password.Length < 8)
+            if (login.Password.Length < 8)
             {
                 Console.WriteLine("A senha deve ter pelo menos 8 caracteres.");
                 return false;
             }
 
-            login.password = Verificacao;
+            login.Password = Verificacao;
             return true;
         }
 
@@ -183,17 +183,17 @@ namespace Logic
                 if (string.IsNullOrEmpty(newUsername))
                 {
                     Console.WriteLine("Username não pode estar vazio. Insira o username novamente:");
-                    login.user = Console.ReadLine();
+                    login.Username = Console.ReadLine();
                 }
                 else if (UsernamesExistentes.Contains(newUsername))
                 {
                     Console.WriteLine("Username já existe. Escolha outro:");
-                    login.password = Console.ReadLine();
+                    login.Password = Console.ReadLine();
                 }
             } while (string.IsNullOrEmpty(newUsername) || UsernamesExistentes.Contains(newUsername));
 
             UsernamesExistentes.Add(newUsername);
-            login.user = newUsername;
+            login.Username = newUsername;
 
             return true;
         }
