@@ -1,22 +1,22 @@
 ﻿using Data;
 using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using veterinaria_ui.Presentation;
 
 namespace Logic
 {
-
     public class AnimalManager
     {
         Animal animal = new Animal();
-        
-        //RETRIEVE
+        int largura = 40;
         public void GetAnimalInfoFromUser()
         {
+            LoopDeco.ExibirLinhaDecorativa(largura);
+
             Console.WriteLine("Insira as informações do animal");
+
+            LoopDeco.ExibirLinhaDecorativa(largura);
 
             animal.Animal_id = IDgenerator.GenerateUniqueRandomID();
 
@@ -74,11 +74,12 @@ namespace Logic
 
         public void SaveAnimalToDatabase(Animal animal)
         {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
-            {
-                DatabaseManager.OpenConnection(connection);
+            string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
-                string query = "INSERT INTO Animais (animal_id, nome, data_nasc, sexo, cor, raca, especie, proprietario_id) " +
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Animal (animal_id, nome, data_nasc, sexo, cor, raca, especie, proprietario_id) " +
                                "VALUES (@AnimalId, @Nome, @DataNasc, @Sexo, @Cor, @Raca, @Especie, @ProprietarioId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
@@ -105,17 +106,20 @@ namespace Logic
                 }
             }
         }
-        public Animal GetAnimalById(int animalId)
-        {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
-            {
-                DatabaseManager.OpenConnection(connection);
 
-                string query = "SELECT animal_id, nome, data_nasc, especie, cor, raca, proprietario_id FROM Animais WHERE animal_id = @AnimalId";
+        public Animal GetAnimalById(string proprietarioID)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT Animal_id, Nome, Data_nasc, Especie, Cor, Raca, Proprietario_id FROM Animal WHERE Proprietario_id = @proprietarioId";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@AnimalId", animalId);
+                    command.Parameters.AddWithValue("@proprietarioId", proprietarioID);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -137,12 +141,13 @@ namespace Logic
                         else
                         {
                             Console.WriteLine("Animal não encontrado na base de dados.");
-                            return null; // Retorna nulo se o animal não for encontrado
+                            return null;
                         }
                     }
                 }
             }
         }
+
         public void GetAnimalInfo(Animal animal)
         {
             Console.WriteLine($"ID do Animal : {animal.Animal_id}");
@@ -152,7 +157,117 @@ namespace Logic
             Console.WriteLine($"Cor: {animal.Cor}");
             Console.WriteLine($"Raça: {animal.Raca}");
             Console.WriteLine($"ID de proprietario: {animal.Proprietario_id}");
+        }
+
+        public void ListAllAnimals()
+        {
+            LoopDeco.ExibirLinhaDecorativa(largura);
+
+            Console.WriteLine("Escolha uma opção:");
+            Console.WriteLine("1. Listar todos os animais");
+            Console.WriteLine("2. Listar animal por ID");
+            Console.WriteLine("Opção: ");
             
+
+
+            if (int.TryParse(Console.ReadLine(), out int opcao))
+            {
+                LoopDeco.ExibirLinhaDecorativa(largura);
+                switch (opcao)
+                {
+                    case 1:
+                        ListAllAnimalsFromDatabase();
+                        break;
+                    case 2:
+                        ListAnimalById();
+                        break;
+                    default:
+                        LoopDeco.ExibirLinhaDecorativa(largura);
+
+                        Console.WriteLine("Opção inválida.");
+                        break;
+                }
+            }
+            else
+            {
+                LoopDeco.ExibirLinhaDecorativa(largura);
+
+                Console.WriteLine("Opção inválida.");
+            }
+        }
+
+        private void ListAllAnimalsFromDatabase()
+        {
+            try
+            {
+                string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT * FROM Animal";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                LoopDeco.ExibirLinhaDecorativa(largura);
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    Console.WriteLine($"{reader.GetName(i)}: {reader.GetValue(i)}");
+                                }
+                                Console.WriteLine();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LoopDeco.ExibirLinhaDecorativa(largura);
+
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+        }
+        private void ListAnimalById()
+        {
+            LoopDeco.ExibirLinhaDecorativa(largura);
+            Console.WriteLine("Insira o ID do animal: ");
+            
+
+
+            if (int.TryParse(Console.ReadLine(), out int animalId))
+            {
+                LoopDeco.ExibirLinhaDecorativa(largura);
+                Animal animal = GetAnimalById(animalId);
+
+                if (animal != null)
+                {
+                    PrintAnimalInfo(animal);
+                }
+            }
+            else
+            {
+                Console.WriteLine("ID do animal inválido.");
+                LoopDeco.ExibirLinhaDecorativa(largura);
+
+            }
+        }
+
+        private void PrintAnimalInfo(Animal animal)
+        {
+            Console.WriteLine($"ID do Animal: {animal.Animal_id}");
+            Console.WriteLine($"Nome: {animal.Nome}");
+            Console.WriteLine($"Data de Nascimento: {animal.Data_nasc.ToShortDateString()}");
+            Console.WriteLine($"Sexo: {animal.Sexo}");
+            Console.WriteLine($"Cor: {animal.Cor}");
+            Console.WriteLine($"Raça: {animal.Raca}");
+            Console.WriteLine($"Especie: {animal.Especie}");
+            Console.WriteLine($"ID de proprietário: {animal.Proprietario_id}");
         }
     }
 }

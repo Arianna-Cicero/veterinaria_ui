@@ -1,28 +1,40 @@
-﻿using Logic;
+﻿using Data;
+using Logic;
+using Logics;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using veterinaria_ui.Presentation;
 
 namespace veterinaria_ui
 {
+
     internal class Program
-    {
+    {        
         static void Main(string[] args)
         {
-            LoginManager loginManager = new LoginManager();
+            Login sharedLogin = new Login();
+            ConsultaManager consultaManager = new ConsultaManager(); 
+            FaturaManager faturaManager = new FaturaManager(); 
+            AnimalManager animalManager = new AnimalManager(); 
+            FuncionarioManager funcionarioManager = new FuncionarioManager(); 
+            Funcionario funcionario = new Funcionario(); 
+            MenuOpcoes sharedMenuOpcoes = new MenuOpcoes(sharedLogin, consultaManager, faturaManager, animalManager, funcionarioManager, funcionario);
+            LoginManager loginManager = new LoginManager(sharedLogin, sharedMenuOpcoes);
             int opcao;
+            
             do
             {
-                Console.Clear(); // Limpa a consola a cada iteração para um visual mais limpo
+                Console.Clear();
                 Console.WriteLine("Bem-vindo à veterinária patinhas!");
                 Console.WriteLine("Selecione uma opção:");
-                Console.WriteLine("1. Inicio de sessão");
-                Console.WriteLine("2. Registo");
-                Console.WriteLine("3. Sair");
+                Console.WriteLine("1. Entrar");
+                Console.WriteLine("2. Sair");
 
                 Console.Write("Escolha a opção desejada: ");
                 if (int.TryParse(Console.ReadLine(), out opcao))
@@ -32,20 +44,15 @@ namespace veterinaria_ui
                         case 1:
                             loginManager.GetLoginInfoFromUser();
                             break;
-
                         case 2:
-                            loginManager.GetLoginInfoFromUser();
                             break;
 
-                        case 3:
-                            break;
-              
                         default:
                             Console.WriteLine("\nPressione qualquer tecla para continuar...");
                             Console.ReadKey();
                             break;
                     }
-                    
+
                 }
                 else
                 {
@@ -54,7 +61,7 @@ namespace veterinaria_ui
                 }
 
             } while (opcao != 3);
-        
+
         }
     }
 }

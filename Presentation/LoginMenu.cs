@@ -10,9 +10,9 @@ namespace veterinaria_ui.Presentation
 {
     public class LoginMenu
     {
-        public LoginMenu()
+        public LoginMenu(Login sharedLogin)
         {
-            LoginManager loginManager = new LoginManager();
+            LoginManager loginManager = new LoginManager(sharedLogin, null); 
             int largura = 40;
 
             LoopDeco.ExibirLinhaDecorativa(largura);
@@ -20,6 +20,6 @@ namespace veterinaria_ui.Presentation
             LoopDeco.ExibirLinhaDecorativa(largura);
             loginManager.GetLoginInfoFromUser();
             LoopDeco.ExibirLinhaDecorativa(largura);
-        }  
+        }
     }
 }

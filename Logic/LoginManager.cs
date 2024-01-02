@@ -1,79 +1,77 @@
 ﻿using Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using veterinaria_ui.Presentation;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
+using System.Text;
+using System;
+using veterinaria_ui.Presentation;
+using System.Runtime.Remoting.Messaging;
 
-namespace Logic
+public class LoginManager
 {
-    public class LoginManager
-    {
-        private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-        private List<string> UsernamesExistentes = new List<string>();
-        public void GetLoginInfoFromUser()
+
+    private readonly List<string> UsernamesExistentes = new List<string>();
+    private readonly MenuOpcoes menuOpcoes;
+    private readonly Login login;
+
+    
+
+    public void GetLoginInfoFromUser()
+    {      
+        int largura = 40;
+        int opcao;
+        do
         {
-            Login login = new Login();
-            int opcao;
-            int largura = 40;
+            LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("1. Realizar registo");
             Console.WriteLine("2. Login");
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("Escreva a opção: ");
             opcao = Convert.ToInt32(Console.ReadLine());
             LoopDeco.ExibirLinhaDecorativa(largura);
+
             if (opcao == 1)
             {
                 Console.WriteLine("Insira o username que pretende utilizar:");
                 login.Username = Console.ReadLine();
-                if (GetValidUsername(login))
+                if (GetValidUsername(login.Username))
                 {
                     Console.WriteLine("Insira a password que pretende utilizar:");
                     login.Password = Console.ReadLine();
-                    if (IsValidPassword(login))
-                    {
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        Console.WriteLine("O seu registo foi realizado com sucesso");
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        using (SqlConnection connection = DatabaseManager.GetConnection())
-                        {
-                            DatabaseManager.OpenConnection(connection);
+                    if (IsValidPassword(login.Password))
+                    {                    
+                        login.Permissao = 3;
+                        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
-                            string query = "INSERT INTO Login (username, password) VALUES (@Username, @Password)";
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            string query = "INSERT INTO Login (Username, Password, Permissao) VALUES (@Username, @Password, @Permissao)";
 
                             using (SqlCommand command = new SqlCommand(query, connection))
                             {
-                                
                                 command.Parameters.AddWithValue("@Username", login.Username);
                                 command.Parameters.AddWithValue("@Password", login.Password);
-
-                                try
-                                {
-                                    int rowsAffected = command.ExecuteNonQuery();
-                                    if (rowsAffected > 0)
-                                    {
-                                        LoopDeco.ExibirLinhaDecorativa(largura);
-                                        Console.WriteLine("O seu registo foi realizado com sucesso e inserido na base de dados!");
-                                        LoopDeco.ExibirLinhaDecorativa(largura);
-                                    }
-                                    else
-                                    {
-                                        LoopDeco.ExibirLinhaDecorativa(largura);
-                                        Console.WriteLine("Falha ao inserir registo na base de dados.");
-                                        LoopDeco.ExibirLinhaDecorativa(largura);
-                                    }
-                                }
-                                catch (Exception ex)
+                                command.Parameters.AddWithValue("@Permissao", login.Permissao);
+                  
+                                int rowsAffected = command.ExecuteNonQuery();
+                                if (rowsAffected > 0)
                                 {
                                     LoopDeco.ExibirLinhaDecorativa(largura);
-                                    Console.WriteLine("Erro ao inserir registo na base de dados: " + ex.Message);
+                                    Console.WriteLine("O seu registo foi realizado com sucesso e inserido na base de dados!");
                                     LoopDeco.ExibirLinhaDecorativa(largura);
+                                    CallShowMenu();
                                 }
+                                else
+                                {
+                                    LoopDeco.ExibirLinhaDecorativa(largura);
+                                    Console.WriteLine("Erro ao inserir registo na base de dados. Voltará ao menu inicial");
+                                    LoopDeco.ExibirLinhaDecorativa(largura);
+                                    Console.ReadKey();
+                                    break;
+                                }                            
                             }
                         }
                     }
@@ -82,121 +80,163 @@ namespace Logic
             else if (opcao == 2)
             {
                 Console.WriteLine("Insira o seu username: ");
-                string usernameInput = Console.ReadLine();
+                 login.Username = Console.ReadLine();
 
                 Console.WriteLine("Insira a sua senha: ");
-                string passwordInput = Console.ReadLine();
+                 login.Password = Console.ReadLine();
 
-                if (IsLoginValid(usernameInput, passwordInput))
+                if (IsLoginValid())
                 {
                     LoopDeco.ExibirLinhaDecorativa(largura);
-                    Console.WriteLine("Login bem-sucedido!");
-                    LoopDeco.ExibirLinhaDecorativa(largura);
+                    Console.WriteLine("Login bem-sucedido!");                  
+                    CallShowMenu();
                 }
                 else
                 {
                     LoopDeco.ExibirLinhaDecorativa(largura);
                     Console.WriteLine("Nome de utilizador ou password incorretos. Tente novamente.");
                     LoopDeco.ExibirLinhaDecorativa(largura);
+                    GetLoginInfoFromUser();
                 }
             }
-        }
-        public bool IsLoginValid(string enteredUsername, string enteredPassword)
+
+        } while (opcao != 0);
+    }
+
+    public LoginManager(Login sharedLogin, MenuOpcoes sharedMenuOpcoes)
+    {
+        login = sharedLogin;
+        menuOpcoes = sharedMenuOpcoes;
+    }
+
+    private bool IsLoginValid()
+    {
+        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+
+        using (SqlConnection connection = new SqlConnection(connectionString))
         {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
+            try
             {
-                DatabaseManager.OpenConnection(connection);
+                connection.Open();
 
-                string query = "SELECT username, password FROM Login WHERE username = @Username";
+             
+                string username = login.Username;
+                string password = login.Password;
 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                string loginQuery = "SELECT Username, Password, Permissao FROM Login WHERE Username = @Username AND Password = @Password";
+
+                using (SqlCommand command = new SqlCommand(loginQuery, connection))
                 {
-                    command.Parameters.AddWithValue("@Username", enteredUsername);
-
+                    command.Parameters.AddWithValue("@Username", username);                   
+                    command.Parameters.AddWithValue("@Password", password);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            string hashedPasswordFromDatabase = reader.GetString(reader.GetOrdinal("password"));
+                            login.Username = reader["Username"].ToString();
+                            login.Password = reader["Password"].ToString();
+                            login.Permissao = Convert.ToInt32(reader["Permissao"]);
 
-                            if (VerifyPassword(enteredPassword, hashedPasswordFromDatabase))
-                            {
-                                return true;
-                            }
+                            Console.WriteLine($"Welcome, {username}!");
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid username or password");
+                            return false;
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+        return true;
+        
+    }
 
+    private bool IsValidPassword(string password)
+    {
+       
+        Console.WriteLine("Insira novamente a sua senha para verificação:");
+        string Verificacao = Console.ReadLine();
+         if (password.Length < 8)
+         {
+            Console.WriteLine("A senha deve ter pelo menos 8 caracteres.");
             return false;
-        }
-        private string GetHash(string input)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
+         }
+         else
+         {
+            if (password != Verificacao)
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
-        private bool VerifyPassword(string enteredPassword, string hashedPasswordFromDatabase)
-        {
-            string hashedEnteredPassword = GetHash(enteredPassword);
-
-            return string.Equals(hashedEnteredPassword, hashedPasswordFromDatabase, StringComparison.OrdinalIgnoreCase);
-        }
-        private bool IsValidPassword(Login login)
-        {
-            
-            Console.WriteLine("Insira novamente a sua senha para verificação:");
-            string Verificacao = Console.ReadLine();
-
-            if (login.Password != Verificacao)
-            {
-                Console.WriteLine("As senhas não coincidem. Tente novamente.");
+                Console.WriteLine("As senhas não coincidem");
                 return false;
-            }
 
-            if (login.Password.Length < 8)
+            }
+            else
             {
-                Console.WriteLine("A senha deve ter pelo menos 8 caracteres.");
-                return false;
+                return true;    
+
             }
+         }
+    }
 
-            login.Password = Verificacao;
-            return true;
-        }
-
-
-        private bool GetValidUsername(Login login)
+    private bool GetValidUsername(string newUsername)
+    {
+        do
         {
-            string newUsername;
-            do
+            if (string.IsNullOrEmpty(newUsername))
             {
-                newUsername = Console.ReadLine();
+                Console.WriteLine("Username não pode estar vazio. Insira o username novamente:");
+                login.Username = Console.ReadLine();
+            }
+            else if (CheckUsernameExistsInDatabase(newUsername))
+            {
+                Console.WriteLine("Username já existe. Escolha outro:");
+                login.Username = Console.ReadLine();
+                GetValidUsername(login.Username);
+            }
+        } while (string.IsNullOrEmpty(newUsername) || CheckUsernameExistsInDatabase(newUsername));
 
-                if (string.IsNullOrEmpty(newUsername))
-                {
-                    Console.WriteLine("Username não pode estar vazio. Insira o username novamente:");
-                    login.Username = Console.ReadLine();
-                }
-                else if (UsernamesExistentes.Contains(newUsername))
-                {
-                    Console.WriteLine("Username já existe. Escolha outro:");
-                    login.Password = Console.ReadLine();
-                }
-            } while (string.IsNullOrEmpty(newUsername) || UsernamesExistentes.Contains(newUsername));
+        UsernamesExistentes.Add(newUsername);
+        login.Username = newUsername;
 
-            UsernamesExistentes.Add(newUsername);
-            login.Username = newUsername;
+        return true;
+    }
+    private bool CheckUsernameExistsInDatabase(string username)
+    {
+        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
-            return true;
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            string checkQuery = "SELECT COUNT(*) FROM Login WHERE Username = @Username";
+
+            using (SqlCommand command = new SqlCommand(checkQuery, connection))
+            {
+                command.Parameters.AddWithValue("@Username", username);
+
+                int count = (int)command.ExecuteScalar();
+
+                return count > 0;
+            }
         }
     }
-}
 
+    public void CallShowMenu()
+    {
+        if (menuOpcoes != null)
+        {
+            menuOpcoes.ShowMenu();
+        }
+        else
+        {
+            Console.WriteLine("MenuOpcoes instance is not available.");
+        }
+    }
+
+
+}

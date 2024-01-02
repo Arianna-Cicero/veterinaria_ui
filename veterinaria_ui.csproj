@@ -58,6 +58,7 @@
     <Compile Include="Logic\LoginManager.cs" />
     <Compile Include="Logic\ProprietarioManager.cs" />
     <Compile Include="Logic\RegisterUser.cs" />
+    <Compile Include="Logic\resetVariables.cs" />
     <Compile Include="Logic\sqlcon.cs" />
     <Compile Include="Presentation\LoginMenu.cs" />
     <Compile Include="Presentation\LoopDeco.cs" />
