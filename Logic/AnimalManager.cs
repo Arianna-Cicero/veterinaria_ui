@@ -1,5 +1,6 @@
 ﻿using Data;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using veterinaria_ui.Presentation;
@@ -8,8 +9,18 @@ namespace Logic
 {
     public class AnimalManager
     {
+        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+
         Animal animal = new Animal();
+        private readonly LoginManager loginManager;
+        private readonly Login login;
+
         int largura = 40;
+
+        public AnimalManager(Login sharedLoginManager)
+        {
+            login = sharedLoginManager;
+        }
         public void GetAnimalInfoFromUser()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
@@ -17,8 +28,7 @@ namespace Logic
             Console.WriteLine("Insira as informações do animal");
 
             LoopDeco.ExibirLinhaDecorativa(largura);
-
-            animal.Animal_id = IDgenerator.GenerateUniqueRandomID();
+         
 
             Console.WriteLine("Nome:");
             string nomeInput = Console.ReadLine();
@@ -74,17 +84,14 @@ namespace Logic
 
         public void SaveAnimalToDatabase(Animal animal)
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Animal (animal_id, nome, data_nasc, sexo, cor, raca, especie, proprietario_id) " +
-                               "VALUES (@AnimalId, @Nome, @DataNasc, @Sexo, @Cor, @Raca, @Especie, @ProprietarioId)";
+                string query = "INSERT INTO Animal (nome, data_nasc, sexo, cor, raca, especie, proprietario_id) " +
+                               "VALUES (@Nome, @DataNasc, @Sexo, @Cor, @Raca, @Especie, @ProprietarioId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@AnimalId", animal.Animal_id);
+                {                
                     command.Parameters.AddWithValue("@Nome", animal.Nome);
                     command.Parameters.AddWithValue("@DataNasc", animal.Data_nasc);
                     command.Parameters.AddWithValue("@Sexo", animal.Sexo);
@@ -107,19 +114,84 @@ namespace Logic
             }
         }
 
-        public Animal GetAnimalById(string proprietarioID)
+        public List<Animal> GetAnimalsByOwnerId()
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+            List<Animal> animals = new List<Animal>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                Console.WriteLine("Escreva o ID do proprietario: ");
+                string input = Console.ReadLine();
+                if (int.TryParse(input, out int proprietarioId))
+                {
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid integer.");
+                }
+                string query = "SELECT Animal_id, Nome, Data_nasc, Especie, Cor, Raca, Proprietario_id FROM Animal WHERE Proprietario_id = @proprietarioId";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@proprietarioId", proprietarioId);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Animal animal = new Animal
+                            {
+                                Animal_id = reader.GetInt32(0),
+                                Nome = reader.GetString(1),
+                                Data_nasc = reader.GetDateTime(2),
+                                Especie = reader.GetString(3),
+                                Cor = reader.GetString(4),
+                                Raca = reader.GetString(5),
+                                Proprietario_id = reader.GetInt32(6)
+                            };
+
+                            animals.Add(animal);
+                        }
+                    }
+                }
+            }
+
+            return animals;
+        }
+
+
+        public void ListAnimalsByOwner()
+        {
+            List<Animal> animals = GetAnimalsByOwnerId();
+
+            if (animals.Count > 0)
+            {
+                foreach (var animal in animals)
+                {
+                    PrintAnimalInfo(animal);
+                    LoopDeco.ExibirLinhaDecorativa(largura);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Nenhum animal encontrado para este proprietário.");
+            }
+        }
+
+
+        public Animal GetAnimalById(int animalID)
+        {
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
 
-                string query = "SELECT Animal_id, Nome, Data_nasc, Especie, Cor, Raca, Proprietario_id FROM Animal WHERE Proprietario_id = @proprietarioId";
+                string query = "SELECT Animal_id, Nome, Data_nasc, Especie, Cor, Raca, Proprietario_id FROM Animal WHERE Proprietario_id = @animalId";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@proprietarioId", proprietarioID);
+                    command.Parameters.AddWithValue("@animalId", animalID);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -233,13 +305,11 @@ namespace Logic
                 Console.WriteLine($"Erro: {ex.Message}");
             }
         }
+        
         private void ListAnimalById()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("Insira o ID do animal: ");
-            
-
-
             if (int.TryParse(Console.ReadLine(), out int animalId))
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
@@ -254,7 +324,6 @@ namespace Logic
             {
                 Console.WriteLine("ID do animal inválido.");
                 LoopDeco.ExibirLinhaDecorativa(largura);
-
             }
         }
 

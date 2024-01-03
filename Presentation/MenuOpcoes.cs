@@ -1,6 +1,5 @@
 ﻿using Data;
 using Logic;
-using Logics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -176,9 +175,7 @@ namespace veterinaria_ui.Presentation
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("As informações sobre o seu animal:");
             LoopDeco.ExibirLinhaDecorativa(largura);
-            // fazer uma variavel que busque o ID do proprietario mediante a tabela de login, assim esta variavel será mandada pra o GetAnimalById(proprietarioID)s
-            //proprietarioID = login.
-            //animalManager.GetAnimalById(proprietarioID);
+            animalManager.ListAnimalsByOwner();
         }
 
         public void MarcacaoConsultas()
@@ -190,27 +187,34 @@ namespace veterinaria_ui.Presentation
             Console.WriteLine("ID do animal: ");
             string id_animal = Console.ReadLine();
             int animalId = int.Parse(id_animal);
-            Console.WriteLine("Data da consulta: ");
+
+            Console.WriteLine("Data da consulta (yyyy-MM-dd): ");
             string dataConsultaString = Console.ReadLine();
             DateTime dataConsulta;
+
             if (DateTime.TryParse(dataConsultaString, out dataConsulta))
             {
-                Console.WriteLine($"Date of Consultation: {dataConsulta.ToShortDateString()}");
+                Console.WriteLine();
             }
             else
             {
-                Console.WriteLine("Data invalida. Por favor insira uma data no formato correto (dia/mês/ano).");
-
+                Console.WriteLine("Data inválida. Por favor, insira uma data no formato correto (yyyy-MM-dd).");
+                return;
             }
+
             Console.Write("Motivo: ");
             string motivo = Console.ReadLine();
 
-            consultaManager.AgendarConsulta(animalId, dataConsulta, motivo);
+            Console.Write("ID de funcionario: ");
+            string funcionarioIdstring = Console.ReadLine();
+            int funcionarioId = int.Parse(funcionarioIdstring);
+
+            consultaManager.AgendarConsulta(animalId, dataConsulta, motivo, funcionarioId);
         }
         public void ConsultarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.Permissao == 2)
+            if (login.Permissao == 2 || login.Permissao == 1)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Consultar animais");
@@ -231,9 +235,8 @@ namespace veterinaria_ui.Presentation
             if (login.Permissao == 1)
             {
                 Console.WriteLine("1. Adicionar funcionario");
-                Console.WriteLine("2. Editar funcionario");
-                Console.WriteLine("3. Remover funcionario");
-                Console.WriteLine("4. Consultar funcionarios");
+                Console.WriteLine("2. Editar funcionario");            
+                Console.WriteLine("3. Consultar funcionarios");
                 Console.Write("Escolha a opção que deseja: ");
                 string input2 = Console.ReadLine();
                 int opcao2 = int.Parse(input2);
@@ -251,24 +254,8 @@ namespace veterinaria_ui.Presentation
                         funcionario.Funcionario_id = int.Parse(Console.ReadLine());
                         funcionarioManager.EditarFuncionarioPorId(funcionario.Funcionario_id);
                         break;
+                    
                     case 3:
-                        Console.WriteLine();
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        Console.WriteLine("Insira o ID do funcionário que pretende remover:");
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        if (int.TryParse(Console.ReadLine(), out int funcionarioId))
-                        {
-                            funcionarioManager.RemoverFuncionarioPorId(funcionarioId);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Por favor, insira um ID válido (número inteiro).");
-                            Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
-                            ShowMenu();
-                            break;
-                        }
-                        break;
-                    case 4:
                         Console.WriteLine();
                         LoopDeco.ExibirLinhaDecorativa(largura);
                         funcionarioManager.GetFuncionario();
@@ -290,7 +277,7 @@ namespace veterinaria_ui.Presentation
         public void ResgistarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.Permissao == 2)
+            if (login.Permissao == 2 || login.Permissao == 1)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Registar animais");

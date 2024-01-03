@@ -14,8 +14,8 @@ public class LoginManager
     private readonly List<string> UsernamesExistentes = new List<string>();
     private readonly MenuOpcoes menuOpcoes;
     private readonly Login login;
+    private readonly string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
-    
 
     public void GetLoginInfoFromUser()
     {      
@@ -42,7 +42,6 @@ public class LoginManager
                     if (IsValidPassword(login.Password))
                     {                    
                         login.Permissao = 3;
-                        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
 
                         using (SqlConnection connection = new SqlConnection(connectionString))
                         {
@@ -111,8 +110,6 @@ public class LoginManager
 
     private bool IsLoginValid()
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
             try
@@ -136,8 +133,7 @@ public class LoginManager
                             login.Username = reader["Username"].ToString();
                             login.Password = reader["Password"].ToString();
                             login.Permissao = Convert.ToInt32(reader["Permissao"]);
-
-                            Console.WriteLine($"Welcome, {username}!");
+                            
                             return true;
                         }
                         else
@@ -153,8 +149,7 @@ public class LoginManager
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
-        return true;
-        
+        return true;      
     }
 
     private bool IsValidPassword(string password)
@@ -207,8 +202,6 @@ public class LoginManager
     }
     private bool CheckUsernameExistsInDatabase(string username)
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
-
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
             connection.Open();
@@ -235,6 +228,32 @@ public class LoginManager
         else
         {
             Console.WriteLine("MenuOpcoes instance is not available.");
+        }
+    }
+
+    public int GetProprietarioIdByLoginUsername(string username)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            string query = "SELECT Proprietario_id FROM Proprietario WHERE Username = @Username";
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Username", username);
+
+                object result = command.ExecuteScalar();
+
+                if (result != null)
+                {
+                    return Convert.ToInt32(result);
+                }
+                else
+                {
+                    return -1; 
+                }
+            }
         }
     }
 

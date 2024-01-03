@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using veterinaria_ui.Presentation;
 
-namespace Logics
+namespace Logic
 {
 
     public class ConsultaManager
@@ -49,7 +49,7 @@ namespace Logics
                                 Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
                             }
-                            CallShowMenu();
+                            
                         }
                     }
                     catch (Exception ex)
@@ -93,7 +93,7 @@ namespace Logics
 
                                     Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
                                 }
-                                CallShowMenu();
+                                
 
                             }
                             else
@@ -110,22 +110,23 @@ namespace Logics
             }
         }
 
-        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo)
+        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo, int funcionarioId)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                string query = "INSERT INTO Consulta (animal_id, data_consulta, motivo) VALUES (@AnimalId, @DataConsulta, @Motivo)";
+                connection.Open();
+
+                string query = "INSERT INTO Consulta (data_consulta, motivo, animal_id, funcionario_id) " +
+                                "VALUES (@DataConsulta, @Motivo, @AnimalId, @FuncionarioId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     try
                     {
-                        connection.Open();
-
-                        command.Parameters.AddWithValue("@AnimalId", animalId);
-                        command.Parameters.AddWithValue("@DataConsulta", dataConsulta);
+                        command.Parameters.AddWithValue("@DataConsulta", dataConsulta.Date);
                         command.Parameters.AddWithValue("@Motivo", motivo);
-                        
+                        command.Parameters.AddWithValue("@AnimalId", animalId);
+                        command.Parameters.AddWithValue("@FuncionarioId", funcionarioId);
 
                         int rowsAffected = command.ExecuteNonQuery();
 
@@ -137,7 +138,8 @@ namespace Logics
                         {
                             Console.WriteLine("Erro ao agendar consulta. Verifique os dados e tente novamente.");
                         }
-                        CallShowMenu();
+
+                       
                     }
                     catch (Exception ex)
                     {
@@ -146,19 +148,6 @@ namespace Logics
                 }
             }
         }
-
-        public void CallShowMenu()
-        {
-            if (menuOpcoes != null)
-            {
-                menuOpcoes.ShowMenu();
-            }
-            else
-            {
-                Console.WriteLine("MenuOpcoes instance is not available.");
-            }
-        }
-
     }
 }
 

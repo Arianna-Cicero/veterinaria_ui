@@ -15,15 +15,9 @@ namespace Data
         public String Nome { get; set; }
         public DateTime Data_nasc { get; set; }
         public String Sexo { get; set; }
-        public String User { get; set; }
-        //public Proprietario()
-        //{
-        //    variableResetter.ResetVariables(this);
-        //}
+        public String Username { get; set; }
 
-        //public void ResetPropritarioProperties()
-        //{
-        //    variableResetter.ResetVariables(this);
-        //}
+        public List<Login> Logins { get; set; }
+
     }
 }
