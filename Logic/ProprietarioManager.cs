@@ -46,7 +46,7 @@ namespace Logic
             Console.WriteLine($"Nome: {proprietario.Nome}");
             Console.WriteLine($"Data de Nascimento: {proprietario.Data_nasc.ToShortDateString()}");
             Console.WriteLine($"Sexo: {proprietario.Sexo}");
-            Console.WriteLine($"Utilizador: {proprietario.User}");
+            Console.WriteLine($"Utilizador: {proprietario.Username}");
         }
     }
 }

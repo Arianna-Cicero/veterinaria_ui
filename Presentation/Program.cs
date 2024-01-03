@@ -1,60 +1,53 @@
-﻿using Logic;
+﻿using Data;
+using Logic;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using veterinaria_ui.Presentation;
 
-namespace veterinaria_ui
+internal class Program
 {
-    internal class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        Data.Login sharedLogin = new Data.Login(); // Use the correct namespace for Login
+        ConsultaManager consultaManager = new ConsultaManager();
+        FaturaManager faturaManager = new FaturaManager();
+        FuncionarioManager funcionarioManager = new FuncionarioManager();
+        Funcionario funcionario = new Funcionario();
+        AnimalManager animalManager = new AnimalManager(sharedLogin);
+        MenuOpcoes sharedMenuOpcoes = new MenuOpcoes(sharedLogin, consultaManager, faturaManager, animalManager, funcionarioManager, funcionario);
+        LoginManager loginManager = new LoginManager(sharedLogin, sharedMenuOpcoes);
+        int opcao;
+
+        do
         {
-            LoginManager loginManager = new LoginManager();
-            int opcao;
-            do
+            Console.Clear();
+            Console.WriteLine("Bem-vindo à veterinária patinhas!");
+            Console.WriteLine("Selecione uma opção:");
+            Console.WriteLine("1. Entrar");
+            Console.WriteLine("2. Sair");
+
+            Console.Write("Escolha a opção desejada: ");
+            if (int.TryParse(Console.ReadLine(), out opcao))
             {
-                Console.Clear(); // Limpa a consola a cada iteração para um visual mais limpo
-                Console.WriteLine("Bem-vindo à veterinária patinhas!");
-                Console.WriteLine("Selecione uma opção:");
-                Console.WriteLine("1. Inicio de sessão");
-                Console.WriteLine("2. Registo");
-                Console.WriteLine("3. Sair");
-
-                Console.Write("Escolha a opção desejada: ");
-                if (int.TryParse(Console.ReadLine(), out opcao))
+                switch (opcao)
                 {
-                    switch (opcao)
-                    {
-                        case 1:
-                            loginManager.GetLoginInfoFromUser();
-                            break;
+                    case 1:
+                        loginManager.GetLoginInfoFromUser();
+                        break;
+                    case 2:
+                        break;
 
-                        case 2:
-                            loginManager.GetLoginInfoFromUser();
-                            break;
-
-                        case 3:
-                            break;
-              
-                        default:
-                            Console.WriteLine("\nPressione qualquer tecla para continuar...");
-                            Console.ReadKey();
-                            break;
-                    }
-                    
+                    default:
+                        Console.WriteLine("\nPressione qualquer tecla para continuar...");
+                        Console.ReadKey();
+                        break;
                 }
-                else
-                {
-                    Console.WriteLine("Entrada inválida. Por favor, insira um número.");
-                    Main(args);
-                }
+            }
+            else
+            {
+                Console.WriteLine("Entrada inválida. Por favor, insira um número.");
+                Main(args);
+            }
 
-            } while (opcao != 3);
-        
-        }
+        } while (opcao != 2);
     }
 }

@@ -9,11 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using veterinaria_ui.Presentation;
 
-namespace Logics
+namespace Logic
 {
-    internal class FaturaManager
+    public class FaturaManager
     {
-        private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+        string connectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+        int largura = 40;
         Fatura fatura =  new Fatura();
         public void CreateFaturaInfoFromUser()
         {
@@ -24,7 +25,7 @@ namespace Logics
             string userInput = Console.ReadLine();
             if (UserExists(userInput))
             {
-                fatura.User = userInput;
+                fatura.Username = userInput;
                 Console.WriteLine("Utilizador válido. Fatura atualizada com sucesso!");
             }
             else
@@ -54,12 +55,11 @@ namespace Logics
         }
         public void GetFaturaByUser(string username)
         {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {              
+                connection.Open();
 
-            using (SqlConnection connection = DatabaseManager.GetConnection())
-            {
-                DatabaseManager.OpenConnection(connection);
-
-                string query = "SELECT fatura_id, data, custo, consulta_id, user FROM Faturas WHERE user = @Username";
+                string query = "SELECT fatura_id, data, custo, consulta_id, user FROM Fatura WHERE user = @Username";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -81,11 +81,12 @@ namespace Logics
         }
         public void GetAllFaturas()
         {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
-            {
-                DatabaseManager.OpenConnection(connection);
 
-                string query = "SELECT fatura_id, data, custo, consulta_id, user FROM Faturas";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT Fatura_id, Data, Custo, Consulta_id, Username FROM Fatura";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -93,12 +94,12 @@ namespace Logics
                     {
                         while (reader.Read())
                         {
-                            Console.WriteLine($"ID da fatura: {reader["fatura_id"]}");
-                            Console.WriteLine($"Data da Fatura: {Convert.ToDateTime(reader["data"]).ToShortDateString()}");
-                            Console.WriteLine($"Custo: {reader["custo"]}");
-                            Console.WriteLine($"ID da consulta: {reader["consulta_id"]}");
-                            Console.WriteLine($"Utilizador: {reader["user"]}");
-                            Console.WriteLine();
+                            Console.WriteLine($"ID da fatura: {reader["Fatura_id"]}");
+                            Console.WriteLine($"Data da Fatura: {Convert.ToDateTime(reader["Data"]).ToShortDateString()}");
+                            Console.WriteLine($"Custo: {reader["Custo"]}");
+                            Console.WriteLine($"ID da consulta: {reader["Consulta_id"]}");
+                            Console.WriteLine($"Utilizador: {reader["Username"]}");
+                            LoopDeco.ExibirLinhaDecorativa(largura);
                         }
                     }
                 }
@@ -106,11 +107,12 @@ namespace Logics
         }
         public bool UserExists(string username)
         {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
-            {
-                DatabaseManager.OpenConnection(connection);
 
-                string query = "SELECT COUNT(*) FROM Usuarios WHERE username = @Username";
+            using(SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT COUNT(*) FROM Login WHERE username = @Username";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -124,17 +126,17 @@ namespace Logics
         }
         public void SaveFaturaToDatabase(Fatura fatura)
         {
-            using (SqlConnection connection = DatabaseManager.GetConnection())
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                DatabaseManager.OpenConnection(connection);
+                connection.Open();
 
-                string query = "INSERT INTO Faturas (fatura_id, user, data, custo) " +
+                string query = "INSERT INTO Fatura (fatura_id, user, data, custo) " +
                                "VALUES (@FaturaId, @User, @Data, @Custo)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@FaturaId", fatura.Fatura_id);
-                    command.Parameters.AddWithValue("@User", fatura.User);
+                    command.Parameters.AddWithValue("@User", fatura.Username);
                     command.Parameters.AddWithValue("@Data", fatura.Data);
                     command.Parameters.AddWithValue("@Custo", fatura.Custo);
 

@@ -9,19 +9,20 @@ using System.Text;
 using System.Threading.Tasks;
 using veterinaria_ui.Presentation;
 
-namespace Logics
+namespace Logic
 {
 
-    internal class ConsultaManager
+    public class ConsultaManager
     {
 
         private readonly string ConnectionString = ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
+        private readonly MenuOpcoes menuOpcoes;
 
         public void ListarTodasConsultas()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                string query = "SELECT * FROM Consultas";
+                string query = "SELECT * FROM Consulta";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -44,10 +45,11 @@ namespace Logics
                                 int animalId = reader.GetInt32(reader.GetOrdinal("animal_id"));
                                 int funcionarioId = reader.GetInt32(reader.GetOrdinal("funcionario_id"));
 
-                                Console.WriteLine($"| {consultaId,-15} | {data,-17:dd/MM/yyyy} | {motivo,-10} | {animalId,-13} | {funcionarioId,-17} |");
+                                Console.WriteLine($"| {consultaId,-15} | {data,-17:dd/MM/yyyy} | {motivo,-15} | {animalId,-8} | {funcionarioId,-10} |");
                                 Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
                             }
+                            
                         }
                     }
                     catch (Exception ex)
@@ -58,38 +60,45 @@ namespace Logics
             }
         }
 
-        public void ListarConsultasPorCliente(int proprietarioId)
+        public void ListarConsultasPorCliente(int animal_id)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                string query = "SELECT * FROM Consultas WHERE animal_id IN (SELECT animal_id FROM Animais WHERE proprietario_id = @ProprietarioId)";
+                string query = "SELECT * FROM Consulta WHERE animal_id IN (SELECT animal_id FROM Animal WHERE Animal_id = @AnimalId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     try
                     {
                         connection.Open();
-                        command.Parameters.AddWithValue("@ProprietarioId", proprietarioId);
+                        command.Parameters.AddWithValue("@AnimalId", animal_id);
 
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
-
                         Console.WriteLine("|  ID da consulta |   Data da consulta  |   Motivo   | ID do animal  |  ID do funcionario  |");
-
                         Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
+                            if (reader.HasRows)
                             {
-                                int consultaId = reader.GetInt32(reader.GetOrdinal("consulta_id"));
-                                DateTime data = reader.GetDateTime(reader.GetOrdinal("data_consulta"));
-                                string motivo = reader.GetString(reader.GetOrdinal("motivo"));
-                                int animalId = reader.GetInt32(reader.GetOrdinal("animal_id"));
-                                int funcionarioId = reader.GetInt32(reader.GetOrdinal("funcionario_id"));
+                                while (reader.Read())
+                                {
+                                    int consultaId = reader.GetInt32(reader.GetOrdinal("consulta_id"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("data_consulta"));
+                                    string motivo = reader.GetString(reader.GetOrdinal("motivo"));
+                                    int animalId = reader.GetInt32(reader.GetOrdinal("animal_id"));
+                                    int funcionarioId = reader.GetInt32(reader.GetOrdinal("funcionario_id"));
 
-                                Console.WriteLine($"| {consultaId,-15} | {data,-19:dd/MM/yyyy} | {motivo,-10} | {animalId,-15} | {funcionarioId,-19} |");
+                                    Console.WriteLine($"| {consultaId,-15} | {data,-19:dd/MM/yyyy} | {motivo,-10} | {animalId,-15} | {funcionarioId,-19} |");
 
-                                Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
+                                    Console.WriteLine("+-----------------+---------------------+------------+---------------+---------------------+");
+                                }
+                                
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Este proprietario nao tem consultas.");
                             }
                         }
                     }
@@ -100,22 +109,24 @@ namespace Logics
                 }
             }
         }
-        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo)
+
+        public void AgendarConsulta(int animalId, DateTime dataConsulta, string motivo, int funcionarioId)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                string query = "INSERT INTO Consultas (animal_id, data_consulta, motivo) VALUES (@AnimalId, @DataConsulta, @Motivo)";
+                connection.Open();
+
+                string query = "INSERT INTO Consulta (data_consulta, motivo, animal_id, funcionario_id) " +
+                                "VALUES (@DataConsulta, @Motivo, @AnimalId, @FuncionarioId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     try
                     {
-                        connection.Open();
-
-                        command.Parameters.AddWithValue("@AnimalId", animalId);
-                        command.Parameters.AddWithValue("@DataConsulta", dataConsulta);
+                        command.Parameters.AddWithValue("@DataConsulta", dataConsulta.Date);
                         command.Parameters.AddWithValue("@Motivo", motivo);
-                        
+                        command.Parameters.AddWithValue("@AnimalId", animalId);
+                        command.Parameters.AddWithValue("@FuncionarioId", funcionarioId);
 
                         int rowsAffected = command.ExecuteNonQuery();
 
@@ -127,6 +138,8 @@ namespace Logics
                         {
                             Console.WriteLine("Erro ao agendar consulta. Verifique os dados e tente novamente.");
                         }
+
+                       
                     }
                     catch (Exception ex)
                     {
@@ -135,7 +148,6 @@ namespace Logics
                 }
             }
         }
-
     }
 }
 

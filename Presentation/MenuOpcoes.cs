@@ -1,6 +1,5 @@
 ﻿using Data;
 using Logic;
-using Logics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +10,38 @@ namespace veterinaria_ui.Presentation
 {
     public class MenuOpcoes
     {
-        ConsultaManager consultaManager = new ConsultaManager();
-        FaturaManager faturamanager = new FaturaManager();
-        AnimalManager animalManager = new AnimalManager();
-        FuncionarioManager funcionarioManager = new FuncionarioManager();
-        Funcionario funcionario = new Funcionario();
-        Login login = new Login();
-        readonly int largura = 40;
+        private readonly ConsultaManager consultaManager;
+        private readonly FaturaManager faturamanager;
+        private readonly AnimalManager animalManager;
+        private readonly FuncionarioManager funcionarioManager;
+        private readonly Funcionario funcionario;
+        private readonly int largura = 40;
+        private readonly Login login;
 
-        public void Menuopcoes() 
+        public MenuOpcoes(Login sharedLogin, ConsultaManager consultaManager, FaturaManager faturamanager, AnimalManager animalManager, FuncionarioManager funcionarioManager, Funcionario funcionario)
+        {
+            this.login = sharedLogin;
+            this.consultaManager = consultaManager;
+            this.faturamanager = faturamanager;
+            this.animalManager = animalManager;
+            this.funcionarioManager = funcionarioManager;
+            this.funcionario = funcionario;
+        }
+
+        public void ShowMenu()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
             LoopDeco.ExibirLinhaCentralizada("Menu opções", largura);
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("1. Ver consultas");
             Console.WriteLine("2. Consultar Faturas ");
-            Console.WriteLine("3. Informações do animal");
+            Console.WriteLine("3. Informações do meu animal");
             if (login.Permissao == 2 || login.Permissao == 1)
             {
                 Console.WriteLine("4. Marcação de consultas");
                 Console.WriteLine("5. Consultar Animais");
                 Console.WriteLine("6. Registar Animais");
-                if(login.Permissao == 1)
+                if (login.Permissao == 1)
                 {
                     Console.WriteLine("7. Gerir funcionarios");
                 }
@@ -42,7 +51,6 @@ namespace veterinaria_ui.Presentation
             string input = Console.ReadLine();
             int opcao = int.Parse(input);
 
-            Console.WriteLine("Entrada inválida. Certifique-se de inserir algum dos números das opções.");
             switch (opcao)
             {
                 case 1:
@@ -52,26 +60,28 @@ namespace veterinaria_ui.Presentation
                     ConsultarFaturas();
                     break;
                 case 3:
-                    InformacoesAnimal();                 
+                    InformacoesAnimal();
                     break;
                 case 4:
                     MarcacaoConsultas();
-                    break;              
+                    break;
                 case 5:
                     ConsultarAnimais();
                     break;
                 case 6:
                     ResgistarAnimais();
-                    break;             
+                    break;
                 case 7:
                     GerirFuncionarios();
                     break;
                 default:
                     Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
-                    Menuopcoes();
+                    ShowMenu();
                     break;
             }
         }
+
+
 
         public void VerConsultas()
         {
@@ -95,17 +105,18 @@ namespace veterinaria_ui.Presentation
 
                     case 2:
                         LoopDeco.ExibirLinhaDecorativa(largura);
-                        Console.WriteLine("Por favor, escreva o ID do cliente: ");
-                        string inputIdCliente = Console.ReadLine();
-                        int opcaoIdCliente = int.Parse(inputIdCliente);
+                        Console.WriteLine("Por favor, escreva o ID do animal: ");
+                        string inputIdanimal = Console.ReadLine();
+                        int opcaoIdAnimal = int.Parse(inputIdanimal);
                         LoopDeco.ExibirLinhaDecorativa(largura);
                         LoopDeco.ExibirLinhaCentralizada("Lista de todas as consultas existentes do cliente", largura);
                         LoopDeco.ExibirLinhaDecorativa(largura);
-                        consultaManager.ListarConsultasPorCliente(opcaoIdCliente);
+                        consultaManager.ListarConsultasPorCliente(opcaoIdAnimal);
+                        
                         break;
                     default:
                         Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
-                        Menuopcoes();
+                        ShowMenu();
                         break;
                 }
             }
@@ -164,6 +175,7 @@ namespace veterinaria_ui.Presentation
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("As informações sobre o seu animal:");
             LoopDeco.ExibirLinhaDecorativa(largura);
+            animalManager.ListAnimalsByOwner();
         }
 
         public void MarcacaoConsultas()
@@ -175,51 +187,45 @@ namespace veterinaria_ui.Presentation
             Console.WriteLine("ID do animal: ");
             string id_animal = Console.ReadLine();
             int animalId = int.Parse(id_animal);
-            Console.WriteLine("Data da consulta: ");
+
+            Console.WriteLine("Data da consulta (yyyy-MM-dd): ");
             string dataConsultaString = Console.ReadLine();
             DateTime dataConsulta;
+
             if (DateTime.TryParse(dataConsultaString, out dataConsulta))
             {
-                Console.WriteLine($"Date of Consultation: {dataConsulta.ToShortDateString()}");
+                Console.WriteLine();
             }
             else
             {
-                Console.WriteLine("Data invalida. Por favor insira uma data no formato correto (dia/mês/ano).");
-
+                Console.WriteLine("Data inválida. Por favor, insira uma data no formato correto (yyyy-MM-dd).");
+                return;
             }
+
             Console.Write("Motivo: ");
             string motivo = Console.ReadLine();
 
-            consultaManager.AgendarConsulta(animalId, dataConsulta, motivo);
+            Console.Write("ID de funcionario: ");
+            string funcionarioIdstring = Console.ReadLine();
+            int funcionarioId = int.Parse(funcionarioIdstring);
+
+            consultaManager.AgendarConsulta(animalId, dataConsulta, motivo, funcionarioId);
         }
         public void ConsultarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.Permissao == 2)
+            if (login.Permissao == 2 || login.Permissao == 1)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Consultar animais");
                 LoopDeco.ExibirLinhaDecorativa(largura);
-                Console.WriteLine("Insira o ID do animal:");
-                if (int.TryParse(Console.ReadLine(), out int animalID))
-                {
-                    Animal animalConsultado = animalManager.GetAnimalById(animalID);
-
-                    if (animalConsultado != null)
-                    {
-                        Console.WriteLine("Animal encontrado:");
-                        animalManager.GetAnimalInfo(animalConsultado);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ID do animal inválido.");
-                }
+                animalManager.ListAllAnimals();
+                
             }
             else
             {
                 Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
-                Menuopcoes();
+                ShowMenu();
 
             }
         }
@@ -229,9 +235,8 @@ namespace veterinaria_ui.Presentation
             if (login.Permissao == 1)
             {
                 Console.WriteLine("1. Adicionar funcionario");
-                Console.WriteLine("2. Editar funcionario");
-                Console.WriteLine("3. Remover funcionario");
-                Console.WriteLine("4. Consultar funcionarios");
+                Console.WriteLine("2. Editar funcionario");            
+                Console.WriteLine("3. Consultar funcionarios");
                 Console.Write("Escolha a opção que deseja: ");
                 string input2 = Console.ReadLine();
                 int opcao2 = int.Parse(input2);
@@ -246,27 +251,11 @@ namespace veterinaria_ui.Presentation
                         LoopDeco.ExibirLinhaDecorativa(largura);
                         Console.WriteLine("Insira o ID do funcionario que pretente editar");
                         LoopDeco.ExibirLinhaDecorativa(largura);
-                        funcionario.funcionario_id = int.Parse(Console.ReadLine());
-                        funcionarioManager.EditarFuncionarioPorId(funcionario.funcionario_id);
+                        funcionario.Funcionario_id = int.Parse(Console.ReadLine());
+                        funcionarioManager.EditarFuncionarioPorId(funcionario.Funcionario_id);
                         break;
+                    
                     case 3:
-                        Console.WriteLine();
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        Console.WriteLine("Insira o ID do funcionário que pretende remover:");
-                        LoopDeco.ExibirLinhaDecorativa(largura);
-                        if (int.TryParse(Console.ReadLine(), out int funcionarioId))
-                        {
-                            funcionarioManager.RemoverFuncionarioPorId(funcionarioId);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Por favor, insira um ID válido (número inteiro).");
-                            Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
-                            Menuopcoes();
-                            break;
-                        }
-                        break;
-                    case 4:
                         Console.WriteLine();
                         LoopDeco.ExibirLinhaDecorativa(largura);
                         funcionarioManager.GetFuncionario();
@@ -274,21 +263,21 @@ namespace veterinaria_ui.Presentation
                         break;
                     default:
                         Console.WriteLine("Opção invalida. Voltara ao menu inicial.");
-                        Menuopcoes();
+                        ShowMenu();
                         break;
                 }
             }
             else
             {
                 Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
-                Menuopcoes();
+                ShowMenu();
 
             }
         }
         public void ResgistarAnimais()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
-            if (login.Permissao == 2)
+            if (login.Permissao == 2 || login.Permissao == 1)
             {
                 LoopDeco.ExibirLinhaDecorativa(largura);
                 Console.WriteLine("Registar animais");
@@ -298,7 +287,7 @@ namespace veterinaria_ui.Presentation
             else
             {
                 Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
-                Menuopcoes();
+                ShowMenu();
             }
         }       
     }

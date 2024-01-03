@@ -34,7 +34,7 @@ namespace Logic
                     Console.WriteLine("A password é muito fraca. Por favor insira outra password com pelo menos minimo 8 caracteres:");
                     login.Password = Console.ReadLine();
                 }
-                //simbolos validacao
+               
             }
             else
             {
