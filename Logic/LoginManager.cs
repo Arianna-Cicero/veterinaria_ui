@@ -26,6 +26,8 @@ public class LoginManager
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("1. Realizar registo");
             Console.WriteLine("2. Login");
+            Console.WriteLine("0. Sair");
+
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("Escreva a opção: ");
             opcao = Convert.ToInt32(Console.ReadLine());
