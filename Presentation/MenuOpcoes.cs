@@ -17,6 +17,7 @@ namespace veterinaria_ui.Presentation
         private readonly Funcionario funcionario;
         private readonly int largura = 40;
         private readonly Login login;
+        private bool isRunning;
 
         public MenuOpcoes(Login sharedLogin, ConsultaManager consultaManager, FaturaManager faturamanager, AnimalManager animalManager, FuncionarioManager funcionarioManager, Funcionario funcionario)
         {
@@ -26,9 +27,21 @@ namespace veterinaria_ui.Presentation
             this.animalManager = animalManager;
             this.funcionarioManager = funcionarioManager;
             this.funcionario = funcionario;
+            isRunning = true;
         }
 
         public void ShowMenu()
+        {
+            do
+            {
+                MostrarMenuOpcoes();
+                int opcao = Convert.ToInt32(Console.ReadLine());
+                ManipularOpcoes(opcao);
+
+            } while (isRunning);
+        }
+
+        public void MostrarMenuOpcoes()
         {
             LoopDeco.ExibirLinhaDecorativa(largura);
             LoopDeco.ExibirLinhaCentralizada("Menu opções", largura);
@@ -46,11 +59,13 @@ namespace veterinaria_ui.Presentation
                     Console.WriteLine("7. Gerir funcionarios");
                 }
             }
+            Console.WriteLine("0. Informações do meu animal");
             LoopDeco.ExibirLinhaDecorativa(largura);
             Console.WriteLine("Escreva a opção pretendida: ");
-            string input = Console.ReadLine();
-            int opcao = int.Parse(input);
+        }
 
+        private void ManipularOpcoes(int opcao)
+        {
             switch (opcao)
             {
                 case 1:
@@ -74,14 +89,16 @@ namespace veterinaria_ui.Presentation
                 case 7:
                     GerirFuncionarios();
                     break;
+                case 0:
+                    isRunning = false;
+                    Console.WriteLine("Saiu do program. Adeus!");
+                    break;
                 default:
                     Console.WriteLine("Opção inválida. Certifique-se de inserir alguma das opções: ");
                     ShowMenu();
                     break;
             }
         }
-
-
 
         public void VerConsultas()
         {
